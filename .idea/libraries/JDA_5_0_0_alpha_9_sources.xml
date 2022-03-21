@@ -1,11 +1,11 @@
 <component name="libraryTable">
   <library name="JDA-5.0.0-alpha.9-sources">
     <CLASSES>
-      <root url="jar://C:/Libraries/JDA/JDA-5.0.0-alpha.9-withDependencies.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../External Library/JDA-5.0.0-alpha.9-withDependencies.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://C:/Libraries/JDA/JDA-5.0.0-alpha.9-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../External Library/JDA-5.0.0-alpha.9-sources.jar!/" />
     </SOURCES>
   </library>
 </component>
