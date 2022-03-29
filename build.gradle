@@ -1,0 +1,26 @@
+plugins {
+    id'application'
+    id'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+mainClassName = 'gator.bot.Bot'
+
+version '1.0'
+def jdaVersion = 'JDA_VERSION_HERE'
+
+sourceCompatibility = targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { // on kotlin dsl use `maven("https://m2.dv8tion.net/releases")` instead
+        url "https://m2.dv8tion.net/releases"
+    }
+}
+
+dependencies {
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    implementation("net.dv8tion:JDA:5.0.0-alpha.9")
+    implementation("ch.qos.logback:logback-classic:1.2.8")
+}
+
+compileJava.options.encoding = 'UTF-8'
