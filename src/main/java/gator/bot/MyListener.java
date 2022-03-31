@@ -2,6 +2,7 @@ package gator.bot;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -94,5 +95,20 @@ public class MyListener extends ListenerAdapter
                 e.printStackTrace();
             }
         }
+    }
+    //Slash Commands
+    @Override
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event)
+    {
+
+        /*--- Slash Test Command ---*/
+        if (event.getName().equals("slash")) { //Check Name
+            long time = System.currentTimeMillis();
+            event.reply("Slash Command Test!").setEphemeral(true) // reply with ghost message
+                    .flatMap(v ->
+                            event.getHook().editOriginalFormat("Delay: %d ms", System.currentTimeMillis() - time) // edit original
+                    ).queue(); // Queue both reply and edit
+        }
+        return;
     }
 }
