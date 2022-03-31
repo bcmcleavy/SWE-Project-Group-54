@@ -6,9 +6,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.io.File;
+import java.io.*;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import java.util.regex.*;
 
 public class MyListener extends ListenerAdapter
 {
@@ -35,6 +40,60 @@ public class MyListener extends ListenerAdapter
             MessageChannel channel = event.getChannel();
             CompletableFuture<File> future = attachments.get(0).downloadToFile(new File("./imageStore/" + "image.jpg"));
             channel.sendMessage("Blue!").queue();
+        }
+        if(Pattern.matches("!issueboard .+ (\\s|\\S)+", content))
+        {
+            MessageChannel channel = event.getChannel();
+            int toSplit = 0;
+            int count = 0;
+            for(int i = 0; i < content.length(); i++)
+            {
+                if(content.charAt(i) == ' ')
+                {
+                    count += 1;
+                    if(count == 2)
+                    {
+                        toSplit = i;
+                        break;
+                    }
+                }
+            }
+            String fileName = content.substring(12, toSplit);
+            String issueText = content.substring(toSplit+1);
+            FileWriter myWriter = null;
+            try {
+                myWriter = new FileWriter("./issueBoards/" + (fileName + ".txt"), true);
+            } catch (IOException e) {
+                channel.sendMessage("Broken file location!").queue();
+                e.printStackTrace();
+            }
+            if(myWriter != null)
+            {
+                try {
+                    myWriter.write(issueText + "\n");
+                    myWriter.close();
+                    channel.sendMessage("Success, issue logged!").queue();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if(Pattern.matches("!readboard (\\s|\\S)+", content)) {
+            File textFile = null;
+            MessageChannel channel = event.getChannel();
+            textFile = new File("./issueBoards/" + (content.substring(11) + ".txt"));
+            try {
+                Scanner s = new Scanner(textFile).useDelimiter("\n");
+                int lineNumber = 1;
+                while(s.hasNextLine())
+                {
+                    String line = s.nextLine();
+                    channel.sendMessage(lineNumber + ". " + line).queue();
+                    lineNumber += 1;
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
     //Slash Commands
