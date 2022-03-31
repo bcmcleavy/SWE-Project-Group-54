@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.*;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -56,11 +57,8 @@ public class MyListener extends ListenerAdapter
                     }
                 }
             }
-            channel.sendMessage(Integer.toString(toSplit));
-            String fileName = content.substring(12, toSplit );
-            channel.sendMessage(fileName);
+            String fileName = content.substring(12, toSplit);
             String issueText = content.substring(toSplit+1);
-            channel.sendMessage(issueText);
             FileWriter myWriter = null;
             try {
                 myWriter = new FileWriter("./issueBoards/" + (fileName + ".txt"), true);
@@ -77,6 +75,23 @@ public class MyListener extends ListenerAdapter
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+        if(Pattern.matches("!readboard (\\s|\\S)+", content)) {
+            File textFile = null;
+            MessageChannel channel = event.getChannel();
+            textFile = new File("./issueBoards/" + (content.substring(11) + ".txt"));
+            try {
+                Scanner s = new Scanner(textFile).useDelimiter("\n");
+                int lineNumber = 1;
+                while(s.hasNextLine())
+                {
+                    String line = s.nextLine();
+                    channel.sendMessage(lineNumber + ". " + line).queue();
+                    lineNumber += 1;
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }
