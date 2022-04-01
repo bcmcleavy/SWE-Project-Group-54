@@ -1,7 +1,9 @@
 package gator.bot;
 
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -94,6 +96,66 @@ public class MyListener extends ListenerAdapter
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+        java.util.List<Role> authorRole = event.getMember().getRoles();
+        Role roleCreator = event.getGuild().getRoleById("958889828118851645");
+        Role teacher = event.getGuild().getRoleById("958912483647684668");
+        Role student = event.getGuild().getRoleById("958890976640909352");
+        Role ta = event.getGuild().getRoleById("958912619098562620");
+        Role author = authorRole.get(0);
+        if(content.startsWith("!changeToRoleCreator")){
+            if(author == roleCreator){
+                java.util.List<Member> move = message.getMentionedMembers();
+                for (Member member : move) {
+                    java.util.List<Role> curRole = member.getRoles();
+                    event.getGuild().addRoleToMember(member, roleCreator).queue();
+                    event.getGuild().removeRoleFromMember(member, curRole.get(0)).queue();
+                    MessageChannel channel = event.getChannel();
+                    channel.sendMessage("Success!").queue();
+                }
+            }
+            else {
+                MessageChannel channel = event.getChannel();
+                channel.sendMessage("You do not have permission to do this!").queue();
+            }
+        }
+
+        if(author == teacher || author == roleCreator) {
+            if (content.startsWith("!changeToTeacher")) {
+                java.util.List<Member> move = message.getMentionedMembers();
+                for (Member member : move) {
+                    java.util.List<Role> curRole = member.getRoles();
+                    event.getGuild().addRoleToMember(member, teacher).queue();
+                    event.getGuild().removeRoleFromMember(member, curRole.get(0)).queue();
+                    MessageChannel channel = event.getChannel();
+                    channel.sendMessage("Success!").queue();
+                }
+
+            }
+            if (content.startsWith("!changeToTA")) {
+                java.util.List<Member> move = message.getMentionedMembers();
+                for (Member member : move) {
+                    java.util.List<Role> curRole = member.getRoles();
+                    event.getGuild().addRoleToMember(member, ta).queue();
+                    event.getGuild().removeRoleFromMember(member, curRole.get(0)).queue();
+                    MessageChannel channel = event.getChannel();
+                    channel.sendMessage("Success!").queue();
+                }
+            }
+            if (content.startsWith("!changeToStudent")) {
+                java.util.List<Member> move = message.getMentionedMembers();
+                for (Member member : move) {
+                    java.util.List<Role> curRole = member.getRoles();
+                    event.getGuild().addRoleToMember(member, student).queue();
+                    event.getGuild().removeRoleFromMember(member, curRole.get(0)).queue();
+                    MessageChannel channel = event.getChannel();
+                    channel.sendMessage("Success!").queue();
+                }
+            }
+        }
+        else{
+            MessageChannel channel = event.getChannel();
+            channel.sendMessage("You do not have permission to do this!").queue();
         }
     }
     //Slash Commands
