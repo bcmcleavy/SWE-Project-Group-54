@@ -111,4 +111,60 @@ public class MyListener extends ListenerAdapter
         }
         return;
     }
+
+    public static String testOutput(String content)
+    {
+        if(Pattern.matches("!issueboard .+ (\\s|\\S)+", content))
+        {
+            int toSplit = 0;
+            int count = 0;
+            for(int i = 0; i < content.length(); i++)
+            {
+                if(content.charAt(i) == ' ')
+                {
+                    count += 1;
+                    if(count == 2)
+                    {
+                        toSplit = i;
+                        break;
+                    }
+                }
+            }
+            String fileName = content.substring(12, toSplit);
+            String issueText = content.substring(toSplit+1);
+            FileWriter myWriter = null;
+            try {
+                myWriter = new FileWriter("./issueBoards/" + (fileName + ".txt"), true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(myWriter != null)
+            {
+                try {
+                    myWriter.write(issueText + "\n");
+                    myWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            File textFile = null;
+            textFile = new File("./issueBoards/" + (fileName + ".txt"));
+            String wholeString = "";
+            try {
+                Scanner s = new Scanner(textFile).useDelimiter("\n");
+                int lineNumber = 1;
+                while(s.hasNextLine())
+                {
+                    String line = lineNumber + ". " + s.nextLine();
+                    wholeString += line;
+                    lineNumber += 1;
+                }
+                return wholeString;
+            } catch (FileNotFoundException e) {
+
+            }
+            return wholeString;
+        }
+        return "broken regex";
+    }
 }
