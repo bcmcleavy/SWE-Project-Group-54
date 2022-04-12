@@ -1,12 +1,13 @@
 package gator.bot;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.*;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
@@ -95,6 +96,40 @@ public class MyListener extends ListenerAdapter
                 e.printStackTrace();
             }
         }
+        if(Pattern.matches("!createTextChannel .*", content))
+        {
+            Member member = event.getMember();
+            createTextChannel(member, content.substring(19));
+        }
+        if(Pattern.matches("!createVoiceChannel .*", content))
+        {
+            Member member = event.getMember();
+            createVoiceChannel(member, content.substring(20));
+        }
+        if(Pattern.matches("!moveMember .*", content))
+        {
+            Member member = event.getMember();
+            MessageChannel channel = event.getChannel();
+            //VoiceChannel myVoiceChan = (VoiceChannel)event.getGuild().getVoiceChannelsByName(content.substring(11), false).toArray()[0];
+            //movePerson(member, (VoiceChannel)event.getGuild().getVoiceChannelsByName(content.substring(11), false).toArray()[0], event);
+            //MessageChannel channel = event.getChannel();
+            for(int i = 0; i < event.getGuild().getVoiceChannels().size(); i++)
+            {
+                String curResult = event.getGuild().getVoiceChannels().get(i).getName();
+                String inputo = content.substring(12);
+                if(curResult.equals(inputo)) {
+                    movePerson(member, event.getGuild().getVoiceChannels().get(i), event);
+                    return;
+                }
+                else
+                {
+                    //channel.sendMessage(event.getGuild().getVoiceChannels().get(i).getName()).queue();
+                }
+            }
+            channel.sendMessage("No voice channel with that name available!").queue();
+            //channel.sendMessage(Integer.toString(event.getGuild().getVoiceChannelsByName(content.substring(11), true).size())).queue();
+            //channel.sendMessage(Integer.toString(event.getGuild().getVoiceChannels().size())).queue();
+        }
     }
     //Slash Commands
     @Override
@@ -167,4 +202,31 @@ public class MyListener extends ListenerAdapter
         }
         return "broken regex";
     }
+    public static void createTextChannel(Member member, String name) {
+        Guild guild = member.getGuild();
+        guild.createTextChannel(name)
+                .addPermissionOverride(member, EnumSet.of(Permission.VIEW_CHANNEL), null)
+                .addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
+                .queue(); // this actually sends the request to discord.
+    }
+    public static void createVoiceChannel(Member member, String name) {
+        Guild guild = member.getGuild();
+        guild.createVoiceChannel(name)
+                .addPermissionOverride(member, EnumSet.of(Permission.VIEW_CHANNEL), null)
+                .addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
+                .queue(); // this actually sends the request to discord.
+    }
+    public static void movePerson(Member member, VoiceChannel voiceChannel, MessageReceivedEvent event)
+    {
+        MessageChannel channel = event.getChannel();
+        try {
+            event.getGuild().moveVoiceMember(member, voiceChannel).queue();
+        }
+        catch(Exception e)
+        {
+            channel.sendMessage("Missing Permissions").queue();
+        }
+    }
+
+
 }
