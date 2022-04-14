@@ -62,7 +62,8 @@ public class Bot {
         JDA api = JDABuilder.createDefault(token).addEventListeners(listener).build();
         //Addition of Slash Commands (Takes up to 1 hr to update)
         api.upsertCommand("slash", "Slash Command Test").queue();
-
+        api.upsertCommand("faq", "Frequently Asked Questions").queue();
+        api.upsertCommand("info","Class Information").queue();
     }
 }
 

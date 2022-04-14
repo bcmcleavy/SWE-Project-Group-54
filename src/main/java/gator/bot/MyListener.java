@@ -12,12 +12,14 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
 public class MyListener extends ListenerAdapter
@@ -81,7 +83,7 @@ public class MyListener extends ListenerAdapter
             }
             if(validDate(commandArray[2]) == false) {
                 channel.sendMessage("Invalid Start Date! Use YYYY-MM-DD").queue();
-            }else if (!(commandArray.length > 3 && validDate(commandArray[3]))) {
+            }else if (!(commandArray.length > 4 && validDate(commandArray[3]))) {
                 channel.sendMessage("Invalid End Date! Use YYYY-MM-DD").queue();
 
             } else {
@@ -90,7 +92,7 @@ public class MyListener extends ListenerAdapter
                 DateTime startTime = new DateTime(commandArray[2]);
                 EventDateTime start = new EventDateTime().setDate(startTime);
                 calendarEvent.setStart(start);
-                if(commandArray.length > 3){
+                if(commandArray.length > 4){
                     //Parse End date
                     DateTime endTime = new DateTime(commandArray[3]);
                     EventDateTime end = new EventDateTime().setDate(endTime);
@@ -109,8 +111,61 @@ public class MyListener extends ListenerAdapter
 
         }
         //-- Modify Event ---//
-        if(commandArray[0] == "!modifyEvent"){
+        if(commandArray[0].equals("!modifyEvent")){
+            Event target = null;
+            String targetID = null;
+            if(commandArray.length < 4){
+                channel.sendMessage("Invalid Usage! !modifyEvent [Name] [New Start] [New End]").queue();
+            } else {
+                DateTime now = new DateTime(System.currentTimeMillis());
+                try {
+                    Events events = calendar.service.events().list("primary")
+                            .setTimeMin(now)
+                            .setOrderBy("startTime")
+                            .setSingleEvents(true)
+                            .execute();
+                    List<Event> items = events.getItems();
 
+                    for (Event eventOfList : items) {
+                        String title = eventOfList.getSummary();
+                        if(title.equals(commandArray[3])){
+                            //Title match, get event ID and delete
+                            target = eventOfList;
+                            targetID = eventOfList.getId();
+                            break;
+                        }
+                        channel.sendMessage("No event of name \"" + commandArray[3] + "\" found!").queue();
+                        return;
+                    }
+                    if(target == null || targetID == null) {
+                        return;
+                    }
+                    //Modify
+                    DateTime startTime = new DateTime(commandArray[2]);
+                    EventDateTime start = new EventDateTime().setDate(startTime);
+                    target.setStart(start);
+
+                    //Update
+                    try {
+                        target = calendar.service.events().update("primary", targetID,target).execute();
+                        channel.sendMessage(("Event Modified! " + target.getHtmlLink())).queue();
+                    } catch (IOException e){
+                        channel.sendMessage("Error Modifying Event!").queue();
+                    }
+                    if(commandArray.length > 4) {
+                        //Parse End date
+                        DateTime endTime = new DateTime(commandArray[3]);
+                        EventDateTime end = new EventDateTime().setDate(endTime);
+                        target.setEnd(end);
+                    } else {
+                        target.setEnd(start);
+                    }
+
+                } catch (IOException e) {
+                    //Error thrown by Calendar API
+                    channel.sendMessage("Error Accessing Calendar!").queue();
+                }
+            }
         }
         //--- Delete Event ---//
         if(commandArray[0].equals("!deleteEvent")){
@@ -161,6 +216,42 @@ public class MyListener extends ListenerAdapter
                     .flatMap(v ->
                             event.getHook().editOriginalFormat("Delay: %d ms", System.currentTimeMillis() - time) // edit original
                     ).queue(); // Queue both reply and edit
+        }
+        if (event.getName().equals("faq")){
+            //FAQ Command
+
+            StringBuilder msgFAQ = new StringBuilder();
+            //Read FAQ text file
+            try {
+                File file = new File("faq.txt");
+                Scanner sc = new Scanner(file);
+                while(sc.hasNextLine()){
+                    msgFAQ.append(sc.nextLine());
+                    msgFAQ.append("\n");
+                }
+                sc.close();
+                event.reply(msgFAQ.toString()).queue();
+            } catch (FileNotFoundException e) {
+                event.reply("FAQ Not Available!").queue();
+            }
+        }
+        if (event.getName().equals("info")){
+            //Info Command
+
+            StringBuilder msgInfo = new StringBuilder();
+            //Read Info text file
+            try {
+                File file = new File("info.txt");
+                Scanner sc = new Scanner(file);
+                while(sc.hasNextLine()){
+                    msgInfo.append(sc.nextLine());
+                    msgInfo.append("\n");
+                }
+                sc.close();
+                event.reply(msgInfo.toString()).queue();
+            } catch (FileNotFoundException e) {
+                event.reply("Info Not Available!").queue();
+            }
         }
 
         return;
