@@ -35,9 +35,9 @@ public class Bot {
     {
 
         //Calendar API
-        /*CalendarBot calendarAPI = new CalendarBot();
+        CalendarBot calendarAPI = new CalendarBot();
         calendarAPI.buildCalendar();
-        calendarAPI.listEvents();*/
+        calendarAPI.listEvents();
 
 
 
