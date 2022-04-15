@@ -35,9 +35,9 @@ public class Bot {
     {
 
         //Calendar API
-        CalendarBot calendarAPI = new CalendarBot();
+        /*CalendarBot calendarAPI = new CalendarBot();
         calendarAPI.buildCalendar();
-        calendarAPI.listEvents();
+        calendarAPI.listEvents();*/
 
 
 
@@ -60,6 +60,8 @@ public class Bot {
         JDA api = JDABuilder.createDefault(token).addEventListeners(new MyListener()).build();
         //Addition of Slash Commands (Takes up to 1 hr to update)
         api.upsertCommand("slash", "Slash Command Test").queue();
+        //api.upsertCommand("issueBoard", "Add to an issue board").queue();
+        //api.upsertCommand("issueRead", "Read off an issue board").queue();
     }
 }
 
