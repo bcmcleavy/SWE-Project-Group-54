@@ -76,6 +76,7 @@ public class MyListener extends ListenerAdapter
         Message commandMsg = event.getMessage();
         String[] commandArray = commandMsg.getContentRaw().split(" ");
         MessageChannel channel = event.getChannel();
+        
         //--- Create Event ---//
         if(commandArray[0].equals("!createEvent")){
             if(commandArray.length < 3){
@@ -83,7 +84,7 @@ public class MyListener extends ListenerAdapter
             }
             if(validDate(commandArray[2]) == false) {
                 channel.sendMessage("Invalid Start Date! Use YYYY-MM-DD").queue();
-            }else if (!(commandArray.length > 4 && validDate(commandArray[3]))) {
+            }else if (!(commandArray.length >= 4 && validDate(commandArray[3]))) {
                 channel.sendMessage("Invalid End Date! Use YYYY-MM-DD").queue();
 
             } else {
@@ -92,7 +93,7 @@ public class MyListener extends ListenerAdapter
                 DateTime startTime = new DateTime(commandArray[2]);
                 EventDateTime start = new EventDateTime().setDate(startTime);
                 calendarEvent.setStart(start);
-                if(commandArray.length > 4){
+                if(commandArray.length >= 4){
                     //Parse End date
                     DateTime endTime = new DateTime(commandArray[3]);
                     EventDateTime end = new EventDateTime().setDate(endTime);
@@ -128,30 +129,21 @@ public class MyListener extends ListenerAdapter
 
                     for (Event eventOfList : items) {
                         String title = eventOfList.getSummary();
-                        if(title.equals(commandArray[3])){
+                        if(title.equals(commandArray[1])){
                             //Title match, get event ID and delete
                             target = eventOfList;
                             targetID = eventOfList.getId();
                             break;
                         }
-                        channel.sendMessage("No event of name \"" + commandArray[3] + "\" found!").queue();
-                        return;
                     }
                     if(target == null || targetID == null) {
+                        channel.sendMessage("No event of name \"" + commandArray[1] + "\" found!").queue();
                         return;
                     }
                     //Modify
                     DateTime startTime = new DateTime(commandArray[2]);
                     EventDateTime start = new EventDateTime().setDate(startTime);
                     target.setStart(start);
-
-                    //Update
-                    try {
-                        target = calendar.service.events().update("primary", targetID,target).execute();
-                        channel.sendMessage(("Event Modified! " + target.getHtmlLink())).queue();
-                    } catch (IOException e){
-                        channel.sendMessage("Error Modifying Event!").queue();
-                    }
                     if(commandArray.length > 4) {
                         //Parse End date
                         DateTime endTime = new DateTime(commandArray[3]);
@@ -160,6 +152,14 @@ public class MyListener extends ListenerAdapter
                     } else {
                         target.setEnd(start);
                     }
+                    //Update
+                    try {
+                        target = calendar.service.events().update("primary", targetID,target).execute();
+                        channel.sendMessage(("Event Modified! " + target.getHtmlLink())).queue();
+                    } catch (IOException e){
+                        channel.sendMessage("Error Modifying Event!").queue();
+                    }
+
 
                 } catch (IOException e) {
                     //Error thrown by Calendar API
@@ -189,7 +189,7 @@ public class MyListener extends ListenerAdapter
                             calendar.service.events().delete("primary", targetId).execute();
                             channel.sendMessage("Event \"" + title + "\" Deleted!").queue();
 
-                            break;
+                            return;
                         }
                     }
                     //No Event Located
