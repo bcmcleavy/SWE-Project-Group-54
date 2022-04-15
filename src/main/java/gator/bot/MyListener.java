@@ -496,4 +496,3 @@ public static String testOutput(String content)
         }
     }
 }
-}
