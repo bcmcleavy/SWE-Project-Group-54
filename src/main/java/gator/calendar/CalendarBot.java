@@ -13,6 +13,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 
 import java.io.FileNotFoundException;
@@ -41,9 +42,9 @@ public class CalendarBot {
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
-    private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR_READONLY);
+    private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
-    static Calendar service;
+    public static Calendar service;
 
     /**
      * Creates an authorized Credential object.
@@ -103,6 +104,23 @@ public class CalendarBot {
                 }
                 System.out.printf("%s (%s)\n", event.getSummary(), start);
             }
+        }
+    }
+    public static void testAddEvent(){
+        Event calendarEvent = new Event().setSummary("Test Event");
+
+        DateTime startTime = new DateTime("2022-05-28");
+        EventDateTime start = new EventDateTime().setDate(startTime);
+        calendarEvent.setStart(start);
+            //Parse End date
+            DateTime endTime = new DateTime("2022-05-29");
+            EventDateTime end = new EventDateTime().setDate(endTime);
+            calendarEvent.setEnd(end);
+        try {
+            calendarEvent = service.events().insert("primary", calendarEvent).execute();
+            System.out.println("Added Test Event");
+        } catch (IOException e) {
+            System.out.println("Error Adding Test Event!");
         }
     }
 }
