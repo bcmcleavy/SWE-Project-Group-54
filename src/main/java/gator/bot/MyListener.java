@@ -19,6 +19,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -360,6 +363,36 @@ public class MyListener extends ListenerAdapter
 
             }
         }
+        if(content.startsWith("!submit ")){
+            String assignmentName = content.substring(8);
+            Path path = Paths.get("./assignments/" + assignmentName);
+            if(attachments.isEmpty()){
+                channel.sendMessage("No attachment included").queue();
+            }
+            else if(Files.exists(path)) {
+                CompletableFuture<File> future = attachments.get(0).downloadToFile(new File("./assignments/" + assignmentName + "/" + attachments.get(0).getFileName()));
+                channel.sendMessage("Success").queue();
+            }
+            else{
+                channel.sendMessage("Assignment does not exist!").queue();
+            }
+        }
+
+        if(content.startsWith("!mkAssignment")){
+            String dir = content.substring(14);
+            if(!(author == teacher || author == ta || author == roleCreator)){
+                channel.sendMessage("You do not have permission to do this!").queue();
+            }
+            else if(dir.isEmpty()){
+                channel.sendMessage("Please include assignment name").queue();
+            }
+            else{
+                new File("./assignments/" + dir).mkdirs();
+                channel.sendMessage("Success!").queue();
+
+            }
+        }
+
     }
 
     //Slash Commands
