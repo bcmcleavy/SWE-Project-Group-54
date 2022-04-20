@@ -10,6 +10,9 @@ def jdaVersion = 'JDA_VERSION_HERE'
 
 sourceCompatibility = targetCompatibility = 1.8
 
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+
 repositories {
     mavenCentral()
     maven { // on kotlin dsl use `maven("https://m2.dv8tion.net/releases")` instead
