@@ -13,6 +13,7 @@ Designed with Java and Discord's API, this project was created in hopes to help 
                  ----------------------
                  Instructions to Launch
                  ----------------------
+                 
 1.) Ensure that you are within the root directory (where this ReadMe is located)
 
 2.) Run the shortcut file titled "Launch GatorBot"
